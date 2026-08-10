@@ -1,6 +1,7 @@
 import { ArrowUpRightIcon, BikeIcon, ChevronDownIcon, LogOutIcon, MapPinIcon, MenuIcon, PackageIcon, SearchIcon, ShieldIcon, ShoppingCartIcon, UserIcon, XIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { userCart } from "../context/CartContext";
 
 
 const Navbar = () => {
@@ -8,10 +9,7 @@ const Navbar = () => {
         name: "John Doe", email: "John@example.com",
         isAdmin: true
     }
-    const { cartCount, setIsCartOpen } = {
-        cartCount: 5,
-        setIsCartOpen: (_data: any) => { }
-    };
+    const { cartCount, setIsCartOpen } = userCart()
     const [searchQuery, setSearchQuery] = useState("")
     const [userMenuOpen, setUserMenuOpen] = useState(false)
     const navigate = useNavigate()
