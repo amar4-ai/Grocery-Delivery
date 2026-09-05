@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
-"postinstall": "prisma generate",
+"scripts": {
+"postinstall": "node ./node_modules/prisma/build/index.js generate",
 "start": "tsx server.ts",
 "server": "nodemon --exec tsx server.ts",
-"build": "prisma generate && tsc"
+"build": "tsc"
 },
   "keywords": [],
   "author": "",
