@@ -106,3 +106,74 @@ export const completeDelivery = async( req: Request, res: Response)=>{
   res.json({order: updateOrder, message: "Delivery completed successfully"})
 
 }
+
+
+// Cancel delivery
+// PUT /api/delivery/my-deliveries/:id/cancel
+export const cancelDelivery = async( req: Request, res: Response)=>{
+    const {reason} = req.body;
+    const order = await prisma.order.findFirst({
+        where: {id: req.params.id as string, deliveryPartnerId: req.partner!.id}
+    })
+
+    if(order!.status === "Delivered"){
+        return res.status(400).json({message: "Cannot cancel a delivered order"});
+    }
+
+    const history = order!.statusHistory as any[];
+    history.push({status: 'Cancelled', note: reason || "", timestamp: new Date()})
+
+    const updateOrder = await prisma.order.update({
+        where: {id : order!.id},
+        data: {status: "Cancelled", statusHistory: history}
+    })
+
+    res.json({order: updateOrder, message: "Delivery cancelled"})
+}
+
+// Update order status
+// PUT /api/delivery/my-deliveries/:id/status
+export const updateDeliveryStatus = async( req: Request, res: Response)=>{
+    const {status} = req.body;
+    const allowedStatuses = ["Packed", "Out for Delivery"];
+
+    if(!allowedStatuses.includes(status)){
+        return res.status(400).json({message: "Invalid status update"});
+    }
+
+    const order = await prisma.order.findFirst({
+        where:{id: req.params.id as string, deliveryPartnerId: req.partner!.id}
+    })
+
+    const history = order!.statusHistory as any[];
+
+    history.push({status, note:`Status updated to ${status}`, timestamp: new Date()})
+
+    const updateOrder = await prisma.order.update({
+        where: {id: order!.id},
+        data: {status, statusHistory: history}
+    })
+
+    res.json({order:updateOrder})
+}
+
+// Update live location
+// PUT/api/delivery/my-deliveries/:id/location
+export const udpateLocation = async( req: Request, res: Response)=>{
+    const {lat, lng} = req.body;
+    const order = await prisma.order.findFirst({
+        where:{
+            id: req.params.id as string,
+            deliveryPartnerId: req.partner!.id,
+            status: {in:['Assigned', 'Packed', "Out for Delivery"]}
+        }
+    })
+
+    await prisma.order.update({
+        where: {id: order!.id},
+        data: {liveLocation: {lat,lng, updatedAt: new Date()}}
+
+    })
+
+    res.json({success:true})
+}
