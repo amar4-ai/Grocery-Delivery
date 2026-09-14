@@ -40,7 +40,7 @@ const Addresses = () => {
       state: add.state,
       zip: add.zip,
       isDefault: add.isDefault })
-setEditingId(add._id)
+setEditingId(add.id)
 setShowFrom(true)
  }
 
@@ -82,7 +82,7 @@ setShowFrom(true)
             <div className="space-y-4">
 
               {addresses.map((addr)=>(
-                <AddressCard key={addr._id} addr={addr} onEditHandler={onEditHandler}
+                <AddressCard key={addr.id} addr={addr} onEditHandler={onEditHandler}
                 setAddresses={setAddresses} />
               ))}
 
