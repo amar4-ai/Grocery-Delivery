@@ -18,7 +18,7 @@ const Addresses = () => {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     label: "",
-    addresses: "",
+    address: "",
     city: "",
     state: "",
     zip: "",
@@ -27,7 +27,7 @@ const Addresses = () => {
 
   const resetForm = () => {
     setForm({
-      label: "", addresses: "", city: "", state: "", zip: "",
+      label: "", address: "", city: "", state: "", zip: "",
       isDefault: false
     });
     setShowFrom(false)
@@ -77,12 +77,15 @@ const Addresses = () => {
 
       if (editingId) {
         const { data } = await api.put(`/addresses/${editingId}`, payload);
-        setAddresses(data.addresses)
-        updateUser({ addresses: data.addresses })
+        console.log("PUT response:", data)
+        setAddresses(data.addresses ?? [])
+        updateUser({ addresses: data.addresses ?? [] })
         toast.success("Address updated successfully")
       } else {
-        const { data } = await api.post("/addresses", payload)
-        updateUser({ addresses: data.addresses })
+        const { data } = await api.post("/addresses", payload);
+        console.log("Post response:", data)
+        setAddresses(data.addresses ?? [])
+        updateUser({ addresses: data.addresses ?? [] })
         toast.success("Address added successfully")
       }
       resetForm()
@@ -94,12 +97,12 @@ const Addresses = () => {
 
   const onEditHandler = (add: Address) => {
     setForm({
-      label: add.label,
-      addresses: add.address,
-      city: add.city,
-      state: add.state,
-      zip: add.zip,
-      isDefault: add.isDefault
+      label: add.label ?? "",
+      address: add.address ?? "",
+      city: add.city ?? "",
+      state: add.state ?? "",
+      zip: add.zip ?? "",
+      isDefault: add.isDefault ?? false
     })
     setEditingId(add.id)
     setShowFrom(true)
@@ -107,7 +110,8 @@ const Addresses = () => {
 
   useEffect(() => {
     api.get("/addresses").then(({ data }) => {
-      setAddresses(data.addresses)
+      console.log("addresses response:", data)
+      setAddresses(data.addresses ?? [])
     }).catch((error: any) => {
       toast.error(error.response?.data?.message || error.message || "Failed to fetch addresses")
     }).finally(() => {
