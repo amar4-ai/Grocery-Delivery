@@ -100,7 +100,7 @@ export const updateAddress = async(req: Request, res:Response) =>{
         orderBy: { createdAt: "asc"}
     })
 
-    res.json({addAddress})
+    res.json({addresses})
 
 }
 
@@ -118,6 +118,6 @@ export const deleteAddress = async(req: Request, res:Response) =>{
         orderBy: {createdAt: "desc"}
     })
 
-    res.json({addAddress})
+    res.json({addresses})
 
 }
