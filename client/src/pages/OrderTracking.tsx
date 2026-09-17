@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import type { Order } from "../types"
-import { dummyDashboardOrdersData } from "../assets/assets"
 import Loading from "../components/Loading"
 import { ArrowLeftIcon, MapPinIcon, PhoneIcon } from "lucide-react"
 import OrderOTP from "../components/OrderTracking/OrderOTP"
 import LiveMap from "../components/OrderTracking/LiveMap"
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine"
+import api from "../config/api"
 
 
 const OrderTracking = () => {
@@ -19,12 +19,11 @@ const OrderTracking = () => {
   const [liveLocation, setLiveLocation] = useState<{lat: Number; lng: number} | null>(null)
 
   useEffect(()=>{
-    setOrder(dummyDashboardOrdersData.find((o)=>o.id == id) as any)
-    setLoading(false)
+    api.get(`/orders/${id}`).then((res)=> setOrder(res.data.order)).catch(()=> navigate("/orders")).finally(()=> setLoading(false))
   },[id, navigate])
 
   if(loading) return <Loading />
-  if(!order) null
+  if(!order) return null
   return (
     <div className="min-h-screen mb-20 bg-app-cream">
 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
