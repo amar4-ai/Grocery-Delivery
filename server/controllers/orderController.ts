@@ -1,12 +1,11 @@
 
 
-// Create order
 
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import { timeStamp } from "node:console";
 import { inngest } from "../inngest/index.js";
 
+// Create order
 // POST/api/orders
 export const createOrder = async(req:Request, res:Response)=>{
     const {items, shippingAddress, paymentMethod} = req.body;
@@ -39,7 +38,7 @@ export const createOrder = async(req:Request, res:Response)=>{
             name: dbProduct.name,
             image: dbProduct.image,
             price: dbProduct.price,
-            quantity: dbProduct.quantity,
+            quantity: item.quantity,
             unit: dbProduct.unit,
         }
     })
@@ -59,7 +58,7 @@ const order = await prisma.order.create({
         deliveryFee,
         tax,
         total,
-        statusHistory: [{status: "Placed", note: "Order placed successfully", timestampt: new Date()}]
+        statusHistory: [{status: "Placed", note: "Order placed successfully", timestamp: new Date()}]
 
     }
 })
@@ -94,7 +93,7 @@ export const getUserOrders = async (req: Request, res: Response)=>{
 
     const where: any ={
         userId: req.user!.id,
-        NOT: [{paymentMehod: "card", isPaid: false}]
+        NOT: [{paymentMethod: "card", isPaid: false}]
 
     }
 if(status && status !== "all"){
@@ -138,7 +137,7 @@ export const updateOrderStatus = async(req:Request, res:Response)=>{
 
     const history = (Array.isArray(order.statusHistory) ? order.statusHistory: []) as any[];
     history.push({status, note: note || `Order ${status.toLowerCase()}`, 
-timeStamp: new Date()})
+timestamp: new Date()})
 
 const updatedOrder = await prisma.order.update({
     where: {id: req.params.id as string},

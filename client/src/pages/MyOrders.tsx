@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Order } from "../types";
 import { Link, useSearchParams } from "react-router-dom";
-import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
+import { statusColors } from "../assets/assets";
 import { userCart } from "../context/CartContext";
 import Loading from "../components/Loading";
 import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 
 const MyOrders = () => {
@@ -16,13 +18,23 @@ const MyOrders = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const tabs = ["all", "Placed", "Out fir Delivery", "Delivered"]
+  const tabs = ["all", "Placed", "Out for Delivery", "Delivered"]
 
   const {clearCart} = userCart()
 
   const fetchOrders = async () => {
-    setOrders(dummyDashboardOrdersData as any)
-    setLoading(false)
+    
+    setLoading(true)
+    try {
+     const params = activeTab !== "all" ? `?status=${activeTab}` : "";
+     const {data} = await api.get(`/orders${params}`)
+     setOrders(data.orders)
+    } catch (error: any) {
+
+      toast.error(error.response?.data?.message || error.message || "Failed to fetch orders")
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(()=>{
@@ -34,6 +46,7 @@ const MyOrders = () => {
       },2000)
     }else{
       fetchOrders()
+
 
     }
     // setLoading(false)
@@ -111,7 +124,7 @@ const MyOrders = () => {
                   {order.items.length} items
                 </span>
                 <span className="font-semibold text-app-green">
-                  {currency} {order.total.toFixed(2)}
+                 {currency} {Number(order.total ?? 0).toFixed(2)}
                 </span>
               </div>
               </Link>
