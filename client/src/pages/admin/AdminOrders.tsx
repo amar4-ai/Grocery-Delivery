@@ -59,7 +59,7 @@ export default function AdminOrders() {
             setSelectedPartner("");
             fetchOrders();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to assign delivery partner");
+            toast.error(error.response?.data?.message || error?.message || "Failed to assign delivery partner");
         }
     };
 
