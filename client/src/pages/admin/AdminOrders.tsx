@@ -50,18 +50,18 @@ export default function AdminOrders() {
        }
     };
 
-    const handleAssign = async () => {
-        if (!assignModal || !selectedPartner) return;
-        try {
-            await api.put(`/admin/order/${assignModal}/assign`, { parterId: selectedPartner});
-            toast.success("Delivery partner assigned!");
-            setAssignModal(null);
-            setSelectedPartner("");
-            fetchOrders();
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || error?.message || "Failed to assign delivery partner");
-        }
-    };
+  const handleAssign = async () => {
+    if (!assignModal || !selectedPartner) return;
+    try {
+        await api.put(`/admin/orders/${assignModal}/assign`, { partnerId: selectedPartner });
+        toast.success("Delivery partner assigned!");
+        setAssignModal(null);
+        setSelectedPartner("");
+        fetchOrders();
+    } catch (error: any) {
+        toast.error(error.response?.data?.message || error?.message || "Failed to assign delivery partner");
+    }
+};
 
     const statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"];
     const statusColors: any = {
