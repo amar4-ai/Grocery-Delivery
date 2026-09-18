@@ -83,35 +83,56 @@ export const updateDeliveryPartner = async(req: Request, res: Response)=>{
 }
 
 // assign delivery partner for order
-export const assignDeliveryPartner = async( req: Request, res: Response)=>{
-    const {partnerId} = req.body;
-    
-    const order = await prisma.order.findUnique({
-        where: {id: req.params.id as string}
-    })
+export const assignDeliveryPartner = async (req: Request, res: Response) => {
+    const { partnerId } = req.body;
 
-    const partner = await prisma.deliveryPartner.findUnique({
-        where: {id : partnerId}
-    })
-
-    const opt = String(Math.floor(100000 + Math.random() * 900000));
-
-    let status = order!.status;
-
-
-    const history : any[] = Array.isArray(order!.statusHistory) ?  order!.statusHistory: [];
-
-    if(order!.status === "Placed" || order!.status === "Confirmed"){
-        status: "Assigned";
-        history.push({
-            status: "Assigned",
-            note: `Assigned to ${partner!.name}`, timestamp: new Date()
-        })
+    if (!partnerId) {
+        res.status(400).json({ message: "partnerId is required" });
+        return;
     }
 
-    await prisma.order.update({
-        where: {id: order!.id},
-        data: {deliveryPartnerId: partner!.id, deliveryOtp: opt, status, statusHistory: history}
-    })
-    res.json({order})
-}
+    const order = await prisma.order.findUnique({
+        where: { id: req.params.id as string }
+    });
+    if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+    }
+
+    const partner = await prisma.deliveryPartner.findUnique({
+        where: { id: partnerId }
+    });
+    if (!partner) {
+        res.status(404).json({ message: "Delivery partner not found" });
+        return;
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+    let status = order.status;
+    const history: any[] = Array.isArray(order.statusHistory) ? order.statusHistory : [];
+
+    if (order.status === "Placed" || order.status === "Confirmed") {
+        status = "Assigned"; // fixed: was `status: "Assigned"`
+        history.push({
+            status: "Assigned",
+            note: `Assigned to ${partner.name}`,
+            timestamp: new Date()
+        });
+    }
+
+    const updatedOrder = await prisma.order.update({
+        where: { id: order.id },
+        data: {
+            deliveryPartnerId: partner.id,
+            deliveryOtp: otp,
+            status,
+            statusHistory: history
+        },
+        include: {
+            deliveryPartner: { select: { name: true, phone: true } }
+        }
+    });
+
+    res.json({ order: updatedOrder }); // return the updated record, with the partner included for the UI
+};
