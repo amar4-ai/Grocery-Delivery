@@ -77,19 +77,12 @@ export const updateProduct = async(req:Request, res: Response)=>{
 
 // DELETE/api/products/:id
 export const deleteProduct = async (req: Request, res: Response) => {
-    try {
-        await prisma.product.delete({ where: { id: req.params.id as string } });
-        res.json({ message: "Deleted" });
-    } catch (error: any) {
-        if (error.code === "P2025") {
-            res.status(404).json({ message: "Product not found" });
-            return;
-        }
-        if (error.code === "P2003") {
-            res.status(409).json({ message: "Cannot delete: product has existing orders. Mark it out of stock instead." });
-            return;
-        }
-        console.error(error);
-        res.status(500).json({ message: "Failed to delete product" });
-    }
+        await prisma.product.update({ where: { id: req.params.id as string },
+             data: { stock: Number(0) } 
+    
+    
+    });
+       
+   
+    res.json({message: "Product Updated"})
 };
