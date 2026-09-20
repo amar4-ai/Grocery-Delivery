@@ -47,7 +47,7 @@ export const getMyDeliveries = async( req: Request, res: Response)=>{
     const where: any = {deliveryPartnerId: req.partner!.id};
 
     if(status === "active"){
-        where.status = {in: ["Assigned", "Packed", "Out for Delivry"]}
+        where.status = {in: ["Assigned", "Packed", "Out for Delivery"]}
     } else if(status === "completed"){
         where.status = {in: ["Delivered", "Cancelled"]}
     }
