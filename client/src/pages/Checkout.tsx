@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { userCart } from "../context/CartContext";
 import type { Address } from "../types";
@@ -82,24 +82,27 @@ const Checkout = () => {
    }
 
   //  Populate address from user's default address
-  useState(()=>{
-    if(user?.addresses?.length){
-      const defaultAddr = user.addresses.find((a)=>a.isDefault) || user.addresses[0]
+ useEffect(() => {
+  if (user?.addresses?.length) {
+    const defaultAddr = user.addresses.find((a) => a.isDefault) || user.addresses[0]
 
-      setAddress({
-        id: defaultAddr?.id,
-    label: defaultAddr?.label,
-    address: defaultAddr?.address,
-    city: defaultAddr?.city,
-    state: defaultAddr?.state,
-    zip: defaultAddr?.zip,
-    isDefault: defaultAddr?.isDefault,
-    lat: defaultAddr?.lat,
-    lng: defaultAddr?.lng
-
-      })
-    }
-  })
+    setAddress((prev) => {
+      // Avoid re-setting if it's already the same address
+      if (prev.id === defaultAddr?.id) return prev;
+      return {
+        id: defaultAddr?.id ?? "",
+        label: defaultAddr?.label ?? "Home",
+        address: defaultAddr?.address ?? "",
+        city: defaultAddr?.city ?? "",
+        state: defaultAddr?.state ?? "",
+        zip: defaultAddr?.zip ?? "",
+        isDefault: defaultAddr?.isDefault ?? false,
+        lat: defaultAddr?.lat ?? 0,
+        lng: defaultAddr?.lng ?? 0,
+      };
+    });
+  }
+}, [user?.addresses]);
 
   if(items.length === 0){
     return (

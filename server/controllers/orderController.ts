@@ -24,12 +24,13 @@ export const createOrder = async (req: Request, res: Response) => {
     products.forEach((p: any) => (productMap[p.id] = p))
 
     // Check if product is in stock
-    for (const item of items) {
-        const product = productMap[item.product]
-        if (!product || (product.stock ?? 0) < item.quantity) {
-            return res.status(404).json({ message: "Product out of stock" });
-        }
+for (const item of items) {
+    const product = productMap[item.product]
+    console.log("item.product:", item.product, "found:", !!product, "stock:", product?.stock, "qty:", item.quantity);
+    if (!product || (product.stock ?? 0) < item.quantity) {
+        return res.status(404).json({ message: "Product out of stock" });
     }
+}
 
     const orderItems = items.map((item: any) => {
         const dbProduct = productMap[item.product];
