@@ -133,7 +133,7 @@ const OrderTracking = () => {
         </h3>
 
         <div className="space-y-3">
-          {order?.items.map((item, i)=>(
+          {order?.items.map((item)=>(
             <div className="flex items-center gap-3">
 
             <img src={item.image} alt={item.name} className="size-10
