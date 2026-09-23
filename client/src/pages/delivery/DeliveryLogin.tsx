@@ -15,7 +15,7 @@ export default function DeliveryLogin() {
         e.preventDefault();
         setLoading(true)
         try {
-            const {data} = await api.post('delivery/login',
+            const {data} = await api.post('/delivery/login',
                 {email, password}
             );
 

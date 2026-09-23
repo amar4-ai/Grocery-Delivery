@@ -16,21 +16,23 @@ api.interceptors.request.use((config)=>{
 })
 
 // Hanle auth errors globlly
-api.interceptors.request.use(
-    (response)=> response,
-    (error)=> {
-        if(error.response?.status === 401){
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("auth_user");
-            // Only redirect if not already on atuh pages
-            if(!window.location.pathname.includes("/login") && 
-        !window.location.pathname.includes("/register")){
-            window.location.href ="/login"
-        }
+
+            if (
+                !window.location.pathname.includes("/login") &&
+                !window.location.pathname.includes("/register")
+            ) {
+                window.location.href = "/login";
+            }
         }
 
-        return Promise.reject(error)
+        return Promise.reject(error);
     }
-)
+);
 
 export default api
